@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#080d18">
+<title>ملك السباق | Racing King</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --cyan: #00e5ff;
+  --gold: #ffcc47;
+  --panel: rgba(15, 25, 48, .92);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+  background: linear-gradient(-45deg,#050816,#101b3d,#241044,#071d2b);
+  background-size: 400% 400%;
+  animation: bgMove 14s ease infinite;
+  overflow-x: hidden;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+header {
+  padding: 17px 10px 12px;
+  background: rgba(5,10,24,.8);
+  border-bottom: 2px solid var(--cyan);
+  box-shadow: 0 4px 24px #00e5ff20;
+}
+
+header h1 {
+  font-size: 28px;
+  color: var(--cyan);
+  margin: 0;
+  text-shadow: 0 0 18px #00e5ff77;
+}
+
+header p {
+  color: #c4d5ed;
+  font-size: 12px;
+  margin: 7px 0 0;
+}
+
+.dashboard {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 12px 8px;
+}
+
+.stat {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 3px;
+  border: 1px solid #344767;
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.stat span {
+  display: block;
+  font-size: 11px;
+  color: #afc3e0;
+  margin-bottom: 5px;
+}
+
+.stat strong {
+  font-size: 18px;
+  color: var(--cyan);
+}
+
+#game {
+  position: relative;
+  width: min(94vw, 400px);
+  height: min(115vw, 510px);
+  min-height: 390px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 3px solid #52627e;
+  border-radius: 18px;
+  background: #28323e;
+  box-shadow: 0 0 30px #00e5ff24;
+  touch-action: manipulation;
+}
+
+#scenery {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 15%,#d0a05b35 0 4%,transparent 5%),
+    radial-gradient(ellipse at 90% 32%,#d0a05b35 0 5%,transparent 6%),
+    radial-gradient(ellipse at 7% 65%,#d0a05b30 0 5%,transparent 6%),
+    linear-gradient(#c18c4b,#8c6036);
+}
+
+.desert {
+  position: absolute;
+  top: 0;
+  width: 12%;
+  height: 100%;
+  opacity: .8;
+  background:
+    radial-gradient(ellipse at 50% 15%,#e6bc75 0 12%,transparent 13%),
+    radial-gradient(ellipse at 40% 47%,#654d34 0 7%,transparent 8%),
+    radial-gradient(ellipse at 70% 78%,#e6bc75 0 15%,transparent 16%);
+}
+
+.desert.left { left: 0; }
+.desert.right { right: 0; }
+
+#road {
+  position: absolute;
+  inset: 0 11%;
+  overflow: hidden;
+  border-left: 4px solid #f7f7f7;
+  border-right: 4px solid #f7f7f7;
+  background: linear-gradient(90deg,#343b45,#252b34 50%,#343b45);
+}
+
+.lane {
+  position: absolute;
+  top: -100%;
+  height: 300%;
+  width: 5px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #f5f5f5 0 36px,
+    transparent 36px 76px
+  );
+  animation: roadMove .55s linear infinite;
+}
+
+.lane.one { left: 33.33%; }
+.lane.two { left: 66.66%; }
+
+@keyframes roadMove {
+  from { transform: translateY(0); }
+  to { transform: translateY(76px); }
+}
+
+.roadEdge {
+  position: absolute;
+  top: 0;
+  width: 12%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #df3444 0 24px,
+    #fff 24px 48px
+  );
+  animation: roadMove .65s linear infinite;
+}
+
+.roadEdge.left { left: 0; }
+.roadEdge.right { right: 0; }
+
+#player {
+  position: absolute;
+  bottom: 22px;
+  left: calc(50% - 25px);
+  width: 50px;
+  height: 82px;
+  border: 2px solid #fff0a5;
+  border-radius: 13px 13px 8px 8px;
+  background: linear-gradient(135deg,#ffe875,#ed8b00);
+  font-size: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  filter: drop-shadow(0 4px 5px #0009);
+  transition: left .09s;
+}
+
+#player::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  height: 17px;
+  background: #8de4ff;
+  border: 2px solid #33485b;
+  border-radius: 5px;
+}
+
+.obstacle {
+  position: absolute;
+  width: 47px;
+  height: 70px;
+  border: 2px solid #ff9c9c;
+  border-radius: 10px;
+  background: linear-gradient(145deg,#ff5b64,#a20e28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  z-index: 4;
+}
+
+#startScreen, #gameOver {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  padding: 20px;
+  background: rgba(5,10,24,.91);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#gameOver { display: none; }
+
+.overlayTitle {
+  color: var(--cyan);
+  font-size: 29px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-shadow: 0 0 15px #00e5ff66;
+}
+
+.overlayText {
+  color: #d9e4f5;
+  font-size: 14px;
+  line-height: 1.9;
+  margin: 0 0 18px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.primary {
+  background: linear-gradient(135deg,#00e5ff,#1687ff);
+  color: #071323;
+  box-shadow: 0 5px 18px #00bfff30;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 13px 8px;
+}
+
+.controlBtn {
+  width: 100px;
+  height: 58px;
+  color: white;
+  background: linear-gradient(145deg,#1a2d4b,#0c172c);
+  border: 1px solid #3b5b81;
+  font-size: 24px;
+  box-shadow: 0 4px 12px #0003;
+  user-select: none;
+}
+
+.controlBtn:active {
+  transform: scale(.94);
+  background: #155071;
+}
+
+.hint {
+  font-size: 12px;
+  color: #c2d0e4;
+  margin: 0 8px 16px;
+}
+
+footer {
+  color: #8ea2bf;
+  font-size: 11px;
+  padding: 12px;
+}
+
+@media (max-height: 700px) {
+  #game {
+    height: 390px;
+    min-height: 390px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏆 ملك السباق</h1>
+  <p>RACING KING • تحدَّ الطريق وكن البطل</p>
+</header>
+
+<section class="dashboard">
+  <div class="stat">
+    <span>🏆 النقاط</span>
+    <strong id="score">0</strong>
+  </div>
+  <div class="stat">
+    <span>🚀 المستوى</span>
+    <strong id="level">1</strong>
+  </div>
+  <div class="stat">
+    <span>⚡ السرعة</span>
+    <strong id="speed">1</strong>
+  </div>
+</section>
+
+<div id="game">
+  <div id="scenery">
+    <div class="desert left"></div>
+    <div class="desert right"></div>
+  </div>
+
+  <div id="road">
+    <div class="lane one"></div>
+    <div class="lane two"></div>
+  </div>
+
+  <div class="roadEdge left"></div>
+  <div class="roadEdge right"></div>
+
+  <div id="player">🚙</div>
+
+  <div id="startScreen">
+    <div class="overlayTitle">🏁 مستعد للسباق؟</div>
+    <div class="overlayText">
+      قد سيارتك على طريق الصحراء.<br>
+      تجنّب السيارات والعوائق.<br>
+      اجمع أكبر عدد من النقاط!
+    </div>
+    <button class="primary" id="startBtn">🚀 ابدأ السباق</button>
+  </div>
+
+  <div id="gameOver">
+    <div class="overlayTitle">💥 انتهى السباق!</div>
+    <div class="overlayText" id="finalScore">نتيجتك: 0</div>
+    <button class="primary" id="restartBtn">🔄 العب من جديد</button>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="controlBtn" id="rightBtn" aria-label="يمين">➡️</button>
+  <button class="controlBtn" id="leftBtn" aria-label="يسار">⬅️</button>
+</div>
+
+<p class="hint">استخدم أزرار اليمين واليسار لتجنّب السيارات.</p>
+
+<footer>RACING KING © 2026 — تحدَّ نفسك!</footer>
+
+<script>
+const game = document.getElementById("game");
+const road = document.getElementById("road");
+const player = document.getElementById("player");
+
+const scoreText = document.getElementById("score");
+const levelText = document.getElementById("level");
+const speedText = document.getElementById("speed");
+
+const startScreen = document.getElementById("startScreen");
+const gameOver = document.getElementById("gameOver");
+const finalScore = document.getElementById("finalScore");
+
+let running = false;
+let score = 0;
+let level = 1;
+let speed = 3;
+let laneIndex = 1;
+let obstacles = [];
+let lastSpawn = 0;
+let lastTime = 0;
+let animationId = null;
+
+const lanePositions = [0.19, 0.50, 0.81];
+
+function setPlayerPosition() {
+  const roadWidth = road.clientWidth;
+  const playerWidth = player.offsetWidth;
+  const center = road.offsetLeft + roadWidth * lanePositions[laneIndex];
+
+  player.style.left = Math.max(
+    0,
+    Math.min(game.clientWidth - playerWidth, center - playerWidth / 2)
+  ) + "px";
+}
+
+function moveLeft() {
+  if (!running) return;
+  laneIndex = Math.max(0, laneIndex - 1);
+  setPlayerPosition();
+}
+
+function moveRight() {
+  if (!running) return;
+  laneIndex = Math.min(2, laneIndex + 1);
+  setPlayerPosition();
+}
+
+document.getElementById("leftBtn").addEventListener("pointerdown", e => {
+  e.preventDefault();
+  moveLeft();
+});
+
+document.getElementById("rightBtn").addEventListener("pointerdown", e => {
+  e.preventDefault();
+  moveRight();
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" || e.key === "a") moveLeft();
+  if (e.key === "ArrowRight" || e.key === "d") moveRight();
+});
+
+function spawnObstacle() {
+  const lane = Math.floor(Math.random() * 3);
+  const el = document.createElement("div");
+
+  el.className = "obstacle";
+  el.textContent = Math.random() < 0.5 ? "🚗" : "🚚";
+
+  const roadWidth = road.clientWidth;
+  const center = road.offsetLeft + roadWidth * lanePositions[lane];
+
+  el.style.left = (center - 23) + "px";
+  el.style.top = "-85px";
+
+  game.appendChild(el);
+
+  obstacles.push({
+    el: el,
+    y: -85,
+    lane: lane,
+    passed: false
+  });
+}
+
+function hitTest(a, b) {
+  const r1 = a.getBoundingClientRect();
+  const r2 = b.getBoundingClientRect();
+
+  return !(
+    r1.right - 8 < r2.left + 8 ||
+    r1.left + 8 > r2.right - 8 ||
+    r1.bottom - 8 < r2.top + 8 ||
+    r1.top + 8 > r2.bottom - 8
+  );
+}
+
+function updateStats() {
+  scoreText.textContent = score;
+  level = Math.min(3, Math.floor(score / 100) + 1);
+  speed = 3 + (level - 1) * 2;
+
+  levelText.textContent = level;
+  speedText.textContent = level;
+}
+
+function gameLoop(timestamp) {
+  if (!running) return;
+
+  if (!lastTime) lastTime = timestamp;
+
+  const delta = Math.min((timestamp - lastTime) / 16.67, 2);
+  lastTime = timestamp;
+
+  if (timestamp - lastSpawn > Math.max(430, 1150 - level * 180)) {
+    spawnObstacle();
+    lastSpawn = timestamp;
+  }
+
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const obstacle = obstacles[i];
+
+    obstacle.y += speed * delta;
+    obstacle.el.style.top = obstacle.y + "px";
+
+    if (hitTest(player, obstacle.el)) {
+      endGame();
+      return;
+    }
+
+    if (!obstacle.passed && obstacle.y > player.offsetTop + 40) {
+      obstacle.passed = true;
+      score += 10;
+      updateStats();
+    }
+
+    if (obstacle.y > game.clientHeight + 90) {
+      obstacle.el.remove();
+      obstacles.splice(i, 1);
+    }
+  }
+
+  animationId = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+  if (animationId) cancelAnimationFrame(animationId);
+
+  obstacles.forEach(o => o.el.remove());
+  obstacles = [];
+
+  score = 0;
+  level = 1;
+  speed = 3;
+  laneIndex = 1;
+  lastSpawn = 0;
+  lastTime = 0;
+
+  updateStats();
+  setPlayerPosition();
+
+  startScreen.style.display = "none";
+  gameOver.style.display = "none";
+
+  running = true;
+  animationId = requestAnimationFrame(gameLoop);
+}
+
+function endGame() {
+  running = false;
+
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+
+  finalScore.textContent =
+    "🏆 نقاطك: " + score + " | المستوى: " + level;
+
+  gameOver.style.display = "flex";
+}
+
+document.getElementById("startBtn").addEventListener("click", startGame);
+document.getElementById("restartBtn").addEventListener("click", startGame);
+
+window.addEventListener("resize", setPlayerPosition);
+
+setPlayerPosition();
+</script>
+
+</body>
+</html>
