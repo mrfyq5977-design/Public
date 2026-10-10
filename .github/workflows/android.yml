@@ -9,6 +9,9 @@ on:
       - 'android-app/**'
       - '.github/workflows/android.yml'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,19 +25,23 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Install Android SDK packages
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
+      - name: Check Android project
+        run: |
+          test -f android-app/settings.gradle || test -f android-app/settings.gradle.kts
+          test -f android-app/app/build.gradle || test -f android-app/app/build.gradle.kts
+          test -f android-app/gradlew && chmod +x android-app/gradlew
 
       - name: Build Debug APK
         working-directory: android-app
